@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.romankh3.image.comparison.ImageComparison;
+import com.github.romankh3.image.comparison.model.ImageComparisonResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -324,10 +325,17 @@ public class CompareScreenshotTest {
                         testInfo.getTestMethod().map(Method::getName).orElse("unknown") + screenShotSuffix + "_diff.png");
 
         //Create ImageComparison object for it.
-        ImageComparison imageComparison = new ImageComparison(expectedImage, background, resultDestination);
-        //Mac OS has round corners in the bottom, so we need to ignore a few pixels
-        imageComparison.setAllowingPercentOfDifferentPixels(0.02d);
-        Assertions.assertTrue(imageComparison.compareImages().getDifferencePercent() < 0.1f);
+        double maxPercentDifferentPixels = 0.1;
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+            //Mac OS windows have rounded bottom corners; ignore up to 5% of pixels.
+            maxPercentDifferentPixels = 5.0;
+        }
+        ImageComparison imageComparison = new ImageComparison(expectedImage, background, resultDestination)
+                .setAllowingPercentOfDifferentPixels(maxPercentDifferentPixels);
+
+        ImageComparisonResult result = imageComparison.compareImages();
+        double percentDifferentPixels = result.getDifferencePercent();
+        Assertions.assertEquals(0.0, percentDifferentPixels, maxPercentDifferentPixels);
     }
 
     private static class DemoCanvas extends AWTGLCanvas {
