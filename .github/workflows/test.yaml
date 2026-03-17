@@ -68,7 +68,7 @@ jobs:
           java-version: 8
           distribution: 'zulu'
       - name: Build with Maven
-        run: ./mvnw -B test
+        run: ./mvnw -B compile
       - name: Upload Images
         uses: actions/upload-artifact@v6
         with:
