@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.repository_owner == 'stephengold' }}
+    if: ${{ github.repository_owner == 'stephengold' && startsWith(github.ref, 'refs/tags/') }}
     steps:
     - uses: actions/checkout@v6
     - name: Set up JDK 8
